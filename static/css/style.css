@@ -29,8 +29,7 @@ body {
   margin: 0;
   font-family: 'Inter', "Segoe UI", Roboto, sans-serif;
   background-color: var(--bg);
-  /* Update the url() path below */
-  background-image: linear-gradient(rgba(248, 250, 252, 0.86), rgba(248, 250, 252, 0.86)), url('/media/watermarked_img_6104104318112304468.jpg');
+  background-image: linear-gradient(rgba(248, 250, 252, 0.86), rgba(248, 250, 252, 0.86)), url('/static/images/backg.jfif');
   background-position: center;
   background-size: cover;
   background-attachment: fixed;
