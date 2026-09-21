@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Demo Buy · Phones{% endblock %}
+{% block content %}
+
+<section class="filters">
+  <form method="get" action="{% url 'home' %}" class="filter-form">
+    <input type="hidden" name="q" value="{{ query }}">
+    <label for="price-filter">Price:</label>
+    <select name="price" id="price-filter" onchange="this.form.submit()">
+      <option value="" {% if not price_filter %}selected{% endif %}>All prices</option>
+      <option value="under_5000" {% if price_filter == "under_5000" %}selected{% endif %}>Under ₦5,000</option>
+      <option value="over_5000" {% if price_filter == "over_5000" %}selected{% endif %}>Over ₦5,000</option>
+      <option value="5000_10000" {% if price_filter == "5000_10000" %}selected{% endif %}>₦5,000 - ₦10,000</option>
+    </select>
+
+    <details class="custom-price">
+      <summary>Custom range</summary>
+      <input type="number" name="min_price" placeholder="Min ₦" value="{{ min_price }}">
+      <input type="number" name="max_price" placeholder="Max ₦" value="{{ max_price }}">
+      <button type="submit" class="btn btn-small">Apply</button>
+    </details>
+  </form>
+</section>
+
+{% if query or price_filter or min_price or max_price %}
+  <p class="results-summary">
+    Showing {{ products.count }} result{{ products.count|pluralize }}
+    {% if query %}for "{{ query }}"{% endif %}
+    <a href="{% url 'home' %}">Clear filters</a>
+  </p>
+{% endif %}
+
+<div class="product-grid">
+  {% for product in products %}
+    {% include "products/partials/product_card.html" %}
+  {% empty %}
+    <p class="empty-state">No phones found. Try a different search or filter.</p>
+  {% endfor %}
+</div>
+
+{% endblock %}

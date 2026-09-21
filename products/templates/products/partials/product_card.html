@@ -1,0 +1,29 @@
+{% load static %}
+<div class="product-card">
+  {% if product.image %}
+    <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
+  {% else %}
+    <div class="product-image product-image-placeholder">📱</div>
+  {% endif %}
+  <h3 class="product-name">{{ product.name }}</h3>
+  <p class="product-price">₦{{ product.price }}</p>
+  {% if product.description %}
+    <p class="product-description">{{ product.description|truncatechars:140 }}</p>
+  {% endif %}
+  <p class="product-stock">
+    {% if product.in_stock %}
+      {{ product.quantity }} available
+    {% else %}
+      <span class="out-of-stock">Out of stock</span>
+    {% endif %}
+  </p>
+  {% if product.in_stock %}
+    <form method="post" action="{% url 'add_to_cart' product.id %}" class="add-to-cart-form">
+      {% csrf_token %}
+      <input type="hidden" name="quantity" value="1">
+      <button type="submit" class="btn btn-primary btn-block">Add to Cart</button>
+    </form>
+  {% else %}
+    <button class="btn btn-disabled btn-block" disabled>Out of Stock</button>
+  {% endif %}
+</div>

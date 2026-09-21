@@ -1,0 +1,43 @@
+# Render "Blueprint" — lets you deploy this repo with one click via
+# https://render.com/docs/blueprint-spec. Push this repo to GitHub, then in
+# the Render dashboard choose "New > Blueprint" and point it at the repo.
+#
+# The free web service tier spins down after 15 minutes of inactivity
+# (cold start ~1 min on the next request). The free Postgres database is
+# deleted 90 days after creation, not 90 days of inactivity — recreate it
+# (and update DATABASE_URL) if you're still on the free plan by then.
+
+databases:
+  - name: demobuy-db
+    plan: free
+    databaseName: demobuy
+    user: demobuy
+
+services:
+  - type: web
+    name: demobuy
+    runtime: python
+    plan: free
+    buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
+    startCommand: "python manage.py migrate --noinput && gunicorn demobuy.wsgi:application --bind 0.0.0.0:$PORT"
+    envVars:
+      - key: DJANGO_SECRET_KEY
+        generateValue: true
+      - key: DJANGO_DEBUG
+        value: "False"
+      - key: DJANGO_ALLOWED_HOSTS
+        value: ".onrender.com"
+      - key: DJANGO_CSRF_TRUSTED_ORIGINS
+        value: "https://*.onrender.com"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: demobuy-db
+          property: connectionString
+      - key: EMAIL_BACKEND_TYPE
+        value: "console"
+      - key: WHATSAPP_NUMBER
+        value: "2348072552365"
+      - key: GOOGLE_OAUTH_CLIENT_ID
+        sync: false
+      - key: GOOGLE_OAUTH_CLIENT_SECRET
+        sync: false
