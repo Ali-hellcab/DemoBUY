@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Order History · Demo Buy{% endblock %}
+{% block content %}
+
+<h1>Your Transfer & Order History</h1>
+
+{% if orders %}
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Reference ID</th>
+        <th>Amount</th>
+        <th>Status</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for order in orders %}
+        <tr>
+          <td>{{ order.created_at|date:"M d, Y" }}</td>
+          <td>{{ order.paystack_reference|slice:":8" }}...</td>
+          <td>₦{{ order.total_amount }}</td>
+          <td>
+            {% if order.is_paid %}
+              <span style="color: green; font-weight: bold;">{{ order.payment_status }}</span>
+              {% if order.is_demo_payment %}
+                <br><small style="color: gray; border: 1px solid gray; padding: 2px 4px; border-radius: 4px;">Demo Payment</small>
+              {% endif %}
+            {% else %}
+              <span style="color: orange; font-weight: bold;">{{ order.payment_status }}</span>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% else %}
+  <p>You have not made any purchases yet.</p>
+  <a href="{% url 'home' %}" class="btn btn-primary">Start Shopping</a>
+{% endif %}
+
+{% endblock %}

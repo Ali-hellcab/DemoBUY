@@ -11,22 +11,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Load environment variables from .env
 load_dotenv(BASE_DIR / ".env")
 
-# ---------------------------------------------------------------------------
+# Paystack Keys
+PAYSTACK_PUBLIC_KEY = os.getenv("PAYSTACK_PUBLIC_KEY")
+PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
+
 # Core settings
-# ---------------------------------------------------------------------------
-
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure-secret-key-change-me")
-
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "127.0.0.1,localhost").split(",")
-
+# Allow ngrok subdomains or wildcard during testing
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.ngrok-free.dev']
 SITE_ID = 1
 
-# ---------------------------------------------------------------------------
 # Applications
-# ---------------------------------------------------------------------------
-
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
@@ -60,12 +57,11 @@ MIDDLEWARE = [
 ]
 
 # Trusted origins for CSRF when running behind HTTPS on a hosting platform.
-# Set as a comma-separated list, e.g. "https://demobuy.onrender.com"
 CSRF_TRUSTED_ORIGINS = [
     origin.strip()
     for origin in os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")
     if origin.strip()
-]
+] + ['https://*.ngrok-free.dev']
 
 ROOT_URLCONF = "demobuy.urls"
 
@@ -88,14 +84,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "demobuy.wsgi.application"
 
-# ---------------------------------------------------------------------------
-# Database (SQLite for dev, ready for PostgreSQL in production)
-# ---------------------------------------------------------------------------
-
+# Database
 if os.getenv("DATABASE_URL"):
-    # Example: postgres://USER:PASSWORD@HOST:PORT/NAME?sslmode=require
     from urllib.parse import urlparse
-
     parsed = urlparse(os.getenv("DATABASE_URL"))
     DATABASES = {
         "default": {
@@ -105,8 +96,6 @@ if os.getenv("DATABASE_URL"):
             "PASSWORD": parsed.password or "",
             "HOST": parsed.hostname or "",
             "PORT": parsed.port or "5432",
-            # Managed Postgres (Render, Railway, etc.) generally requires SSL.
-            # Set DJANGO_DB_SSL_REQUIRE=False for local/self-hosted Postgres.
             "OPTIONS": (
                 {"sslmode": "require"}
                 if os.getenv("DJANGO_DB_SSL_REQUIRE", "True") == "True"
@@ -122,17 +111,12 @@ else:
         }
     }
 
-# ---------------------------------------------------------------------------
 # Auth
-# ---------------------------------------------------------------------------
-
 AUTH_USER_MODEL = "accounts.CustomUser"
-
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 ]
-
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -144,10 +128,9 @@ LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "home"
 LOGOUT_REDIRECT_URL = "home"
 
-# django-allauth configuration (modern setting names)
 ACCOUNT_LOGIN_METHODS = {"email", "username"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
-ACCOUNT_EMAIL_VERIFICATION = "none"  # set to "mandatory" in production
+ACCOUNT_EMAIL_VERIFICATION = "none"
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_USER_MODEL_USERNAME_FIELD = "username"
 ACCOUNT_LOGOUT_ON_GET = False
@@ -164,12 +147,8 @@ SOCIALACCOUNT_PROVIDERS = {
     }
 }
 
-# ---------------------------------------------------------------------------
-# Email (password reset)
-# ---------------------------------------------------------------------------
-
-EMAIL_BACKEND_TYPE = os.getenv("EMAIL_BACKEND_TYPE", "console")  # console | smtp | sendgrid
-
+# Email
+EMAIL_BACKEND_TYPE = os.getenv("EMAIL_BACKEND_TYPE", "console")
 if EMAIL_BACKEND_TYPE == "smtp":
     EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
     EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
@@ -185,57 +164,33 @@ elif EMAIL_BACKEND_TYPE == "sendgrid":
     EMAIL_HOST_USER = "apikey"
     EMAIL_HOST_PASSWORD = os.getenv("SENDGRID_API_KEY", "")
 else:
-    # Prints emails to the console - good for local development
     EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "no-reply@demobuy.local")
 
-# ---------------------------------------------------------------------------
 # Internationalization
-# ---------------------------------------------------------------------------
-
 LANGUAGE_CODE = "en-us"
 TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-# ---------------------------------------------------------------------------
 # Static & media files
-# ---------------------------------------------------------------------------
-
 STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
-
-# WhiteNoise serves compressed, cache-busted static files directly from the
-# app process, so no separate static file host/CDN is required on Render,
-# Railway, PythonAnywhere, etc.
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
 }
-
 MEDIA_URL = "media/"
 MEDIA_ROOT = BASE_DIR / "media"
-
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# ---------------------------------------------------------------------------
-# Production security (only applied when DEBUG=False)
-# ---------------------------------------------------------------------------
-
+# Production security
 if not DEBUG:
     SECURE_SSL_REDIRECT = os.getenv("DJANGO_SECURE_SSL_REDIRECT", "True") == "True"
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-
-# ---------------------------------------------------------------------------
-# WhatsApp checkout number
-# ---------------------------------------------------------------------------
 
 WHATSAPP_NUMBER = os.getenv("WHATSAPP_NUMBER", "2348072552365")

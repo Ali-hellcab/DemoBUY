@@ -20,13 +20,16 @@
       <div class="auth-bar">
         {% if user.is_authenticated %}
           <span>Welcome, {{ user.username }}</span>
+          
+          <!-- NEW: Order History Link -->
+          <a href="{% url 'order_history' %}" style="margin: 0 15px;">Order History</a>
+          
           <form method="post" action="{% url 'accounts:logout' %}" class="inline-form">
             {% csrf_token %}
             <button type="submit" class="link-btn">Logout</button>
           </form>
         {% else %}
           <a href="{% url 'accounts:login' %}">Login</a>
-      
         {% endif %}
       </div>
 

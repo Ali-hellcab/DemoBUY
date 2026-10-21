@@ -7,7 +7,7 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("accounts/", include("accounts.urls")),
     path("accounts/", include("allauth.urls")),  # Google OAuth endpoints
-    path("", include("products.urls")),
+    path("", include("products.urls")),          # Routes home, cart, checkout, payment, and history
 ]
 
 if settings.DEBUG:

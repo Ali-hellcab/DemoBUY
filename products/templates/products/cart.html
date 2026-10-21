@@ -35,19 +35,36 @@
     <p class="cart-subtotal">Subtotal: ₦{{ cart.get_total_price }}</p>
     <p class="cart-total">Total: ₦{{ cart.get_total_price }}</p>
 
-    {% if user.is_authenticated %}
-      <form method="post" action="{% url 'checkout' %}">
+    <!-- Use Flexbox to put both buttons in the same row -->
+    <div class="cart-action-row" style="display: flex; gap: 10px; margin-top: 15px;">
+      
+      <!-- Clear Cart Form (Posts back to this exact same page) -->
+      <form method="post" action="{% url 'cart' %}" style="flex: 1;" onsubmit="return confirm('Clear entire cart?');">
         {% csrf_token %}
-        <button type="submit" class="btn btn-primary btn-block btn-large">
-          Purchase via WhatsApp
+        <!-- The name="clear_cart" is what tells the view to empty the list -->
+        <button type="submit" name="clear_cart" class="btn btn-danger btn-block" style="background-color: #dc3545; color: white; height: 100%;">
+          Clear Cart
         </button>
       </form>
-    {% else %}
-      <a href="{% url 'accounts:login' %}?next={% url 'cart' %}" class="btn btn-primary btn-block btn-large">
-        Login to Purchase
-      </a>
-    {% endif %}
+
+      <!-- Checkout Form -->
+      {% if user.is_authenticated %}
+        <form method="post" action="{% url 'checkout' %}" style="flex: 2;">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary btn-block btn-large">
+            Proceed to Secure Checkout
+          </button>
+        </form>
+      {% else %}
+        <a href="{% url 'accounts:login' %}?next={% url 'cart' %}" class="btn btn-primary btn-block btn-large" style="flex: 2; display: flex; align-items: center; justify-content: center;">
+          Login to Purchase
+        </a>
+      {% endif %}
+
+    </div>
   </div>
+
+  
 {% endif %}
 
 {% endblock %}
