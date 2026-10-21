@@ -19,8 +19,14 @@ PAYSTACK_SECRET_KEY = os.getenv("PAYSTACK_SECRET_KEY")
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", "dev-insecure-secret-key-change-me")
 DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
 
-# Allow ngrok subdomains or wildcard during testing
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', '.ngrok-free.dev']
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "DJANGO_ALLOWED_HOSTS",
+        "127.0.0.1,localhost,.ngrok-free.dev",
+    ).split(",")
+    if host.strip()
+]
 SITE_ID = 1
 
 # Applications
