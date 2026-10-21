@@ -19,7 +19,7 @@ services:
     runtime: python
     plan: free
     buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput"
-    startCommand: "python manage.py migrate --noinput && gunicorn demobuy.wsgi:application --bind 0.0.0.0:$PORT"
+    startCommand: "bash build.sh && gunicorn demobuy.wsgi:application --bind 0.0.0.0:$PORT"
     envVars:
       - key: DJANGO_SECRET_KEY
         generateValue: true
@@ -33,6 +33,12 @@ services:
         fromDatabase:
           name: demobuy-db
           property: connectionString
+      - key: DJANGO_SUPERUSER_USERNAME
+        sync: false
+      - key: DJANGO_SUPERUSER_EMAIL
+        sync: false
+      - key: DJANGO_SUPERUSER_PASSWORD
+        sync: false
       - key: EMAIL_BACKEND_TYPE
         value: "console"
       - key: WHATSAPP_NUMBER
