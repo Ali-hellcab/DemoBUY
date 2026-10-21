@@ -1,4 +1,3 @@
-
 #!/usr/bin/env bash
 set -o errexit
 
@@ -19,12 +18,9 @@ user, created = User.objects.get_or_create(
     username=username,
     defaults={'email': email}
 )
-
 user.email = email
 user.is_staff = True
 user.is_superuser = True
 user.set_password(password)
 user.save()
-
-print('Superuser created.' if created else 'Superuser credentials updated.')
 "
