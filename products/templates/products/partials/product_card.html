@@ -1,6 +1,8 @@
 {% load static %}
 <div class="product-card">
-  {% if product.image %}
+  {% if product.static_image %}
+    <img src="{% static product.static_image %}" alt="{{ product.name }}" class="product-image">
+  {% elif product.image %}
     <img src="{{ product.image.url }}" alt="{{ product.name }}" class="product-image">
   {% else %}
     <div class="product-image product-image-placeholder">📱</div>

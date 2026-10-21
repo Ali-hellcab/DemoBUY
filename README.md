@@ -121,10 +121,16 @@ correctly with `DEBUG=False`, without needing a separate static host or CDN.
      send real emails — it defaults to `console` (no real email is sent) so the app deploys clean
      first.
 4. First deploy runs `collectstatic` and `migrate` automatically (see `render.yaml` /
-   `Procfile`). Create an admin user from the Render **Shell** tab: `python manage.py createsuperuser`.
+   `Procfile`). The configured start command also runs `build.sh` to create or update the admin user.
 5. Update the Google Cloud Console OAuth client's authorized redirect URI to
    `https://<your-service>.onrender.com/accounts/google/login/callback/`, and set the Django
    **Sites** record (`/admin/sites/site/`) domain to `<your-service>.onrender.com`.
+
+For fixed product photos on Render, put each image in `static/images/products/`, commit and push
+the files, then set that product's **Static image** field in Django admin to its path relative to
+`static/`, such as `images/products/phone.jpg`. Render's local media filesystem is ephemeral, so
+images uploaded through the **Image** field are not a reliable way to persist product photos across
+deploys or restarts.
 
 Notes: the free web service spins down after 15 minutes idle (~1 min cold start on the next
 request), and the free Postgres database is deleted 90 days after creation (not 90 days of
